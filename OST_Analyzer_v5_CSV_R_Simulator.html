@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>OST Analyzer v5 — CSV &amp; R Simulator</title><style>:root{color-scheme:dark;--bg:#080d18;--panel:#101827;--line:#26354b;--text:#edf3ff;--muted:#91a2bc;--blue:#75a7ff;--green:#39d6a0;--red:#ff7185}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#142443 0,transparent 42%),var(--bg);color:var(--text);font:14px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{max-width:1500px;margin:auto;padding:28px}.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:24px}.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--blue);font-weight:800}.title{font-size:clamp(26px,4vw,42px);line-height:1.1;margin:8px 0}.subtitle,.muted{color:var(--muted)}.pill{border:1px solid #31445f;border-radius:999px;padding:7px 12px;color:#bcd0f0;font-size:11px;white-space:nowrap}.panel{background:linear-gradient(145deg,rgba(19,31,49,.97),rgba(12,20,33,.99));border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 12px 35px #0002}.section-title{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:#b7c7df;font-weight:800;margin:0 0 14px}.drop{border:1px dashed #496489;border-radius:12px;padding:24px;text-align:center;background:#0b1424;transition:.2s}.drop.drag{border-color:var(--blue);background:#14243d}.drop strong{display:block;font-size:16px;margin-bottom:5px}.drop p{margin:0 0 14px;color:var(--muted)}input,select,button{font:inherit}input[type=file]{display:none}.btn{background:#203452;color:#eaf2ff;border:1px solid #3b5376;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:700}.btn.primary{background:#2766d9;border-color:#4380ef}.btn:hover{filter:brightness(1.12)}.controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin-top:15px}.field{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:12px}.field input,.field select,.search{background:#0a1220;border:1px solid var(--line);border-radius:8px;padding:9px 10px;color:var(--text);min-width:125px}.status{font-size:12px;color:var(--muted);margin-top:12px}.status.error{color:var(--red)}.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.kpi{background:#0b1422;border:1px solid #22324a;border-radius:12px;padding:15px;min-width:0}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.kpi .value{font-size:clamp(18px,2vw,26px);font-weight:800;margin-top:6px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.kpi .hint{font-size:11px;color:var(--muted);margin-top:4px}.positive{color:var(--green)!important}.negative{color:var(--red)!important}.neutral{color:var(--text)}.charts{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.chartbox{min-height:250px}.chartbox canvas{width:100%;height:230px;display:block}.chart-legend{display:flex;gap:14px;color:var(--muted);font-size:11px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}th,td{text-align:right;padding:10px 12px;border-bottom:1px solid #1e2b3e}th{color:#9fb3d1;background:#0a1220;position:sticky;top:0;font-size:10px;text-transform:uppercase;letter-spacing:.06em}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}tbody tr:hover{background:#162238}tbody tr:last-child td{border-bottom:0}.tabletools{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}.search{min-width:220px}.note{color:#aebed5;line-height:1.8;font-size:12px}.note strong{color:#edf3ff}.foot{color:#71829c;font-size:11px;text-align:center;padding:12px}@media(max-width:1050px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.charts{grid-template-columns:1fr}}@media(max-width:600px){.wrap{padding:14px}.top{display:block}.pill{display:inline-block;margin-top:10px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}}@media print{body{background:#080d18!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.wrap{max-width:none;padding:8mm}.drop,.controls,.tabletools .btn,.foot{display:none!important}.panel,.kpi{break-inside:avoid;box-shadow:none}.table-wrap{overflow:visible}table{font-size:9px}th{position:static}}
+.rgrid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px}
+.rparams{display:grid;gap:15px}
+.rfield{padding-bottom:12px;border-bottom:1px solid #26354b}
+.rhead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px;color:#dce7f8;font-weight:700}
+.rval{color:var(--blue);font-variant-numeric:tabular-nums;font-weight:850}
+.rcontrol{display:grid;grid-template-columns:28px minmax(0,1fr) 28px;gap:8px;align-items:center}
+.rcontrol input[type=range]{width:100%;min-width:0;accent-color:var(--blue);cursor:pointer}
+.rstep{height:28px;width:28px;border:1px solid #34445d;border-radius:8px;background:#0c1422;color:var(--blue);font-size:18px;line-height:1;cursor:pointer}
+.rstep:disabled{opacity:.35;cursor:not-allowed}
+.rends{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.rhint{font-size:11px;color:var(--muted);margin-top:5px}
+.rkpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.rkpi{background:#0b1422;border:1px solid #22324a;border-radius:12px;padding:13px;min-width:0}
+.rkpi .label{font-size:11px;color:var(--muted);min-height:30px}
+.rkpi .value{font-size:clamp(18px,2vw,25px);font-weight:850;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.rrows{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.rbox{background:#0b1422;border:1px solid #22324a;border-radius:12px;padding:14px;min-width:0}
+.rrow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #1e2b3e}
+.rrow:last-child{border-bottom:0}
+.rrow span{color:var(--muted)}
+.rrow strong{text-align:right;font-variant-numeric:tabular-nums}
+.rstatus{display:inline-block;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800}
+@media(max-width:1050px){.rgrid{grid-template-columns:1fr}.rkpis{grid-template-columns:repeat(2,minmax(0,1fr))}.rrows{grid-template-columns:1fr}}
+</style><style>
+.mode-chooser{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 18px}
+.mode-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:10px;padding:23px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(19,31,49,.97),rgba(12,20,33,.99));color:var(--text);cursor:pointer;min-height:175px;transition:border-color .18s,transform .18s,background .18s}
+.mode-card:hover{border-color:var(--blue);transform:translateY(-2px);background:#142238}
+.mode-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#203452;color:var(--blue);font-size:22px;font-weight:800}
+.mode-card strong{font-size:19px}
+.mode-card span:last-child{color:var(--muted);font-size:13px;line-height:1.6}
+.modebar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}
+.mode-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:800}
+.mode-back{background:transparent;color:#bcd0f0;border:1px solid #31445f;border-radius:9px;padding:7px 11px;cursor:pointer;font:inherit;font-size:12px}
+.mode-back:hover{border-color:var(--blue)}
+#simMode .sim-intro{color:var(--muted);font-size:12px;margin:-6px 0 14px;line-height:1.6}
+@media(max-width:650px){.mode-chooser{grid-template-columns:1fr}.mode-card{min-height:140px}.modebar{align-items:flex-start;flex-direction:column}}
+
+/* Isolated styles for the R parameter simulator */
+#simMode .head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}
+#simMode .eyebrow{font-size:11px;letter-spacing:.16em;color:var(--blue);font-weight:800}
+#simMode .title{font-size:28px;letter-spacing:-.04em;margin:4px 0}
+#simMode .desc{color:var(--muted);max-width:720px}
+#simMode .tag{padding:9px 12px;border:1px solid var(--line);border-radius:12px;color:var(--muted);white-space:nowrap;background:#121a29}
+#simMode .grid{display:grid;grid-template-columns:330px 1fr;gap:16px}
+#simMode .panel{background:linear-gradient(150deg,#151f31,#101725);border:1px solid var(--line);border-radius:17px;padding:19px;min-width:0}
+#simMode .panel h2{font-size:14px;margin:0 0 17px}
+#simMode .field{margin-bottom:19px}
+#simMode .fh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+#simMode .fh label{font-weight:700}
+#simMode .val{font-size:15px;font-weight:850;color:var(--blue);font-variant-numeric:tabular-nums}
+#simMode .range{width:100%;accent-color:var(--blue);cursor:pointer;min-width:0}
+#simMode .range-control{display:grid;grid-template-columns:28px minmax(0,1fr) 28px;align-items:center;gap:8px}
+#simMode .step-btn{height:28px;width:28px;border:1px solid #34445d;border-radius:8px;background:#0c1422;color:var(--blue);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:background .15s,border-color .15s}
+#simMode .step-btn:hover{background:#1a2a42;border-color:var(--blue)}
+#simMode .step-btn:active{transform:scale(.96)}
+#simMode .step-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#simMode .step-btn:disabled{opacity:.35;cursor:not-allowed}
+#simMode .ends{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:3px}
+#simMode .hint{font-size:11px;color:var(--muted);margin-top:6px}
+#simMode .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:13px}
+#simMode .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px;min-width:0}
+#simMode .k{font-size:11px;color:var(--muted);min-height:30px}
+#simMode .v{font-size:22px;font-weight:850;letter-spacing:-.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#simMode .green{color:var(--green)}
+#simMode .red{color:var(--red)}
+#simMode .blue{color:var(--blue)}
+#simMode .amber{color:var(--amber)}
+#simMode .twocol{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+#simMode .rows{display:grid}
+#simMode .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #253249}
+#simMode .row:last-child{border-bottom:0}
+#simMode .row span{color:var(--muted)}
+#simMode .row strong{text-align:right;font-variant-numeric:tabular-nums}
+#simMode .formula{padding:12px 13px;background:#0b1321;border:1px solid var(--line);border-radius:11px;color:#c5d3e9;font-size:12px;margin-top:13px}
+#simMode .formula b{color:var(--text)}
+#simMode .status{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}
+#simMode .note{color:var(--muted);font-size:11px;margin-top:13px}
+#simMode .section-gap{margin-top:13px}
+#simMode .divider{border:0;border-top:1px solid var(--line);margin:15px 0}
+#simMode .mini-title{color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+@media(max-width:880px){
+#simMode .grid{grid-template-columns:1fr}
+#simMode .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+#simMode .twocol{grid-template-columns:1fr}
+#simMode .head{flex-direction:column}
+#simMode .title{font-size:24px}
+#simMode .v{font-size:21px}
+}</style></head><body><div class="wrap"><header class="top"><div><div class="eyebrow">HAN EDGE / GOHAN OST</div><h1 class="title">OST <span style="color:var(--blue)">Analyzer</span><span style="font-size:12px;color:var(--muted);vertical-align:middle;margin-left:8px">v5</span></h1><div class="subtitle">Một công cụ, hai chế độ: phân tích CSV giao dịch thực tế hoặc mô phỏng hiệu suất bằng các tham số R.</div></div><div class="pill">OFFLINE · MULTI-CSV REPORT</div></header><div aria-label="Chọn chế độ OST Analyzer" class="mode-chooser" id="modeChooser">
+<button class="mode-card" data-mode="csv" type="button">
+<span class="mode-icon">↥</span>
+<strong>Nạp CSV giao dịch</strong>
+<span>Phân tích lịch sử thực tế, đường cong vốn, hiệu suất theo mã và nhật ký giao dịch.</span>
+</button>
+<button class="mode-card" data-mode="sim" type="button">
+<span class="mode-icon">⌁</span>
+<strong>Mô phỏng tham số</strong>
+<span>Kéo thanh trượt để kiểm tra kỳ vọng R, chi phí, RR, tỷ lệ thắng và giới hạn lợi nhuận/thua lỗ.</span>
+</button>
+</div><div hidden="True" id="csvMode"><div class="modebar"><div class="mode-label">CHẾ ĐỘ 01 / DỮ LIỆU THỰC TẾ</div><button class="mode-back" data-back="1" type="button">← Chọn chế độ khác</button></div><section class="panel"><h2 class="section-title">01 / Nạp CSV</h2><div class="drop" id="drop"><strong>Kéo thả bất kỳ CSV giao dịch vào đây</strong><p>Hỗ trợ báo cáo P/L trực tiếp, lịch sử Replay và lịch sử lệnh Paper Trading.</p><label class="btn primary" for="file">Chọn file CSV</label><input accept=".csv,text/csv" id="file" type="file"/></div><div class="controls"><label class="field">Giá trị 1R (USD/USDT)<input id="risk" min="0.01" step="any" type="number" value="1000"/></label><label class="field">Vốn đầu kỳ<input id="capital" min="0" placeholder="Mặc định 0" step="any" type="number"/></label><label class="field">Lọc hướng<select id="direction"><option value="all">Tất cả</option><option value="Long">Long</option><option value="Short">Short</option><option value="—">Không rõ</option></select></label><button class="btn" id="reset">Đặt lại</button><button class="btn" id="export">Xuất CSV</button><button class="btn" id="print">In / Lưu PDF</button></div><div class="status" id="status">Nạp một CSV để bắt đầu.</div></section><div hidden="" id="report"><section class="panel"><h2 class="section-title">02 / Tổng quan</h2><div class="top" style="margin:0 0 14px"><div><div id="source" style="font-size:22px;font-weight:850">—</div><div class="muted" id="period">—</div></div><div class="pill" id="count">0 giao dịch</div></div><div class="kpis" id="kpis"></div></section><section class="charts"><div class="panel chartbox"><h2 class="section-title">03 / Đường cong vốn</h2><canvas id="equity"></canvas><div class="chart-legend"><span>— Vốn đầu kỳ + P/L ròng</span></div></div><div class="panel chartbox"><h2 class="section-title">04 / P/L từng giao dịch</h2><canvas id="bars"></canvas><div class="chart-legend"><span class="positive">■ Lãi</span><span class="negative">■ Lỗ</span></div></div></section><section class="panel"><h2 class="section-title">05 / Phân rã hiệu suất</h2><div class="kpis" id="breakdown"></div></section><section class="panel"><h2 class="section-title">06 / Theo mã giao dịch</h2><div class="table-wrap"><table><thead><tr><th>Mã</th><th>Lệnh</th><th>Thắng</th><th>Win rate</th><th>P/L ròng</th><th>R</th><th>Hoa hồng</th></tr></thead><tbody id="symbols"></tbody></table></div></section><section class="panel" id="edgePanel">
+<h2 class="section-title">07 / Đánh giá hệ thống theo R</h2>
+<p class="note" style="margin-top:0">Đánh giá này được tính trực tiếp từ các giao dịch trong CSV và bộ lọc hiện tại. Không có thanh kéo hay giả định để thay thế lịch sử thực tế. Hãy nhập đúng giá trị tiền tệ tương ứng với 1R ở đầu trang.</p>
+<div class="rkpis" id="actualR"></div>
+<div class="rrows">
+<div class="rbox">
+<h3 style="margin:0 0 8px;font-size:13px">Các thông số ghi nhận</h3>
+<div class="rrow"><span>Số lệnh thắng / thua / hòa</span><strong id="actualCounts">—</strong></div>
+<div class="rrow"><span>Tỷ lệ thắng / thua / hòa</span><strong id="actualRates">—</strong></div>
+<div class="rrow"><span>RR lời trung bình (trước phí)</span><strong id="actualRR">—</strong></div>
+<div class="rrow"><span>Lỗ trung bình mỗi lệnh thua (trước phí)</span><strong id="actualLoss">—</strong></div>
+<div class="rrow"><span>Chi phí trung bình mỗi lệnh</span><strong id="actualCost">—</strong></div>
+<div class="rrow"><span>Tỷ lệ thắng hòa vốn ước tính</span><strong id="actualBE">—</strong></div>
+</div>
+<div class="rbox">
+<h3 style="margin:0 0 8px;font-size:13px">Diễn giải kết quả</h3>
+<div class="rstatus" id="actualVerdict">Đang chờ dữ liệu</div>
+<p class="note" id="actualSummary">Nạp CSV để tạo nhận xét.</p>
+<div class="rrow"><span>Công thức kỳ vọng</span><strong id="actualFormula">—</strong></div>
+<div class="rrow"><span>Kỳ vọng theo thành phần</span><strong id="actualComponentExp">—</strong></div>
+<div class="rrow"><span>Độ tin cậy của mẫu</span><strong id="actualSample">—</strong></div>
+</div>
+</div>
+<div class="rbox" style="margin-top:14px">
+<h3 style="margin:0 0 8px;font-size:13px">Cách hiểu các chỉ số kỳ vọng</h3>
+<div class="note" id="expectancyGuide"></div>
+</div>
+<div class="note" style="margin-top:12px"><strong>Lưu ý:</strong> kỳ vọng dương trong mẫu lịch sử không đảm bảo lợi nhuận tương lai. Số lệnh, sự ổn định theo thời gian, mức sụt giảm, chất lượng dữ liệu và kết quả ngoài mẫu đều quan trọng. Nếu CSV không có dữ liệu phí hoặc 1R không phản ánh mức rủi ro thực tế của từng lệnh, các chỉ số liên quan sẽ bị giới hạn.</div>
+</section>
+<section class="panel"><div class="tabletools"><div><h2 class="section-title" style="margin:0">08 / Nhật ký giao dịch</h2><div class="status" id="ledgerMeta"></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input class="search" id="search" placeholder="Tìm mã, hướng, ngày, tín hiệu..."/><button class="btn" id="ledgerToggle" type="button">Hiển thị tất cả</button></div></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Thời điểm</th><th>Mã</th><th>Hướng</th><th>Loại dữ liệu</th><th>Giá vào</th><th>Giá ra</th><th>Khối lượng</th><th>Gross P/L</th><th>Hoa hồng</th><th>P/L ròng</th><th>R</th></tr></thead><tbody id="ledger"></tbody></table></div></section>
+<section class="panel"><h2 class="section-title">09 / Cách OST suy ra dữ liệu</h2><div class="note" id="method"></div></section><div class="foot">OST ANALYZER · Dữ liệu xử lý cục bộ, không tải lên máy chủ.</div></div></div><div hidden="True" id="simMode"><div class="modebar"><div class="mode-label">CHẾ ĐỘ 02 / MÔ PHỎNG GIẢ ĐỊNH</div><button class="mode-back" data-back="1" type="button">← Chọn chế độ khác</button></div><p class="sim-intro">Kết quả được tính từ các tham số giả định bên trái; đây không phải kết quả thực tế từ CSV và không mô phỏng thứ tự thắng/thua.</p><div class="grid">
+<aside class="panel">
+<h2>Tham số đầu vào</h2>
+<div class="field"><div class="fh"><label for="rr">RR trung bình</label><span class="val" id="rrV">2,0R</span></div><div class="range-control"><button aria-label="Giảm rr" class="step-btn" data-for="rr" data-step="-1" title="Giảm một bước" type="button">−</button><input class="range" id="rr" max="5" min="0" step=".1" type="range" value="2"/><button aria-label="Tăng rr" class="step-btn" data-for="rr" data-step="1" title="Tăng một bước" type="button">+</button></div><div class="ends"><span>0R</span><span>5R</span></div><div class="hint">Mức lời trung bình của một lệnh thắng.</div></div>
+<div class="field"><div class="fh"><label for="wr">Tỷ lệ thắng</label><span class="val" id="wrV">45%</span></div><div class="range-control"><button aria-label="Giảm wr" class="step-btn" data-for="wr" data-step="-1" title="Giảm một bước" type="button">−</button><input class="range" id="wr" max="100" min="0" step="1" type="range" value="45"/><button aria-label="Tăng wr" class="step-btn" data-for="wr" data-step="1" title="Tăng một bước" type="button">+</button></div><div class="ends"><span>0%</span><span>100%</span></div></div>
+<div class="field"><div class="fh"><label for="be">Tỷ lệ hòa vốn</label><span class="val" id="beV">10%</span></div><div class="range-control"><button aria-label="Giảm be" class="step-btn" data-for="be" data-step="-1" title="Giảm một bước" type="button">−</button><input class="range" id="be" max="100" min="0" step="1" type="range" value="10"/><button aria-label="Tăng be" class="step-btn" data-for="be" data-step="1" title="Tăng một bước" type="button">+</button></div><div class="ends"><span>0%</span><span>100%</span></div><div class="hint">Lệnh đóng ở 0R; tỷ lệ thua được tính tự động.</div></div>
+<div class="field"><div class="fh"><label for="trades">Số lệnh</label><span class="val" id="tradesV">100</span></div><div class="range-control"><button aria-label="Giảm trades" class="step-btn" data-for="trades" data-step="-1" title="Giảm một bước" type="button">−</button><input class="range" id="trades" max="500" min="1" step="1" type="range" value="100"/><button aria-label="Tăng trades" class="step-btn" data-for="trades" data-step="1" title="Tăng một bước" type="button">+</button></div><div class="ends"><span>1 lệnh</span><span>500 lệnh</span></div></div>
+<div class="field"><div class="fh"><label for="cost">Chi phí trung bình mỗi lệnh</label><span class="val" id="costV">0,05R</span></div><div class="range-control"><button aria-label="Giảm cost" class="step-btn" data-for="cost" data-step="-1" title="Giảm một bước" type="button">−</button><input class="range" id="cost" max="0.5" min="0" step=".01" type="range" value=".05"/><button aria-label="Tăng cost" class="step-btn" data-for="cost" data-step="1" title="Tăng một bước" type="button">+</button></div><div class="ends"><span>0R</span><span>0,5R</span></div><div class="hint">Phí và trượt giá trung bình tính theo R cho mỗi lệnh.</div></div>
+<hr class="divider"/>
+<div class="mini-title">Quy tắc dừng</div>
+<div class="field"><div class="fh"><label for="target">Mục tiêu lợi nhuận</label><span class="val" id="targetV">+10R</span></div><div class="range-control"><button aria-label="Giảm target" class="step-btn" data-for="target" data-step="-1" title="Giảm một bước" type="button">−</button><input class="range" id="target" max="20" min="1" step="1" type="range" value="10"/><button aria-label="Tăng target" class="step-btn" data-for="target" data-step="1" title="Tăng một bước" type="button">+</button></div><div class="ends"><span>+1R</span><span>+20R</span></div></div>
+<div class="field" style="margin-bottom:0"><div class="fh"><label for="stop">Giới hạn thua lỗ</label><span class="val" id="stopV">−10R</span></div><div class="range-control"><button aria-label="Giảm stop" class="step-btn" data-for="stop" data-step="-1" title="Giảm một bước" type="button">−</button><input class="range" id="stop" max="20" min="1" step="1" type="range" value="10"/><button aria-label="Tăng stop" class="step-btn" data-for="stop" data-step="1" title="Tăng một bước" type="button">+</button></div><div class="ends"><span>−1R</span><span>−20R</span></div></div>
+</aside>
+<main>
+<div class="kpis">
+<div class="kpi"><div class="k">Kỳ vọng ròng mỗi lệnh</div><div class="v amber" id="expNet">+0,10R</div></div>
+<div class="kpi"><div class="k">Tổng R kỳ vọng sau chi phí</div><div class="v green" id="totalNet">+10R</div></div>
+<div class="kpi"><div class="k">Hệ số lợi nhuận</div><div class="v blue" id="pf">1,50</div></div>
+<div class="kpi"><div class="k">Tỷ lệ thắng hòa vốn</div><div class="v blue" id="wrBE">—</div></div>
+</div>
+<section class="panel">
+<h2>Phân tích kết quả kỳ vọng</h2>
+<div class="rows">
+<div class="row"><span>Tỷ lệ thua (tự tính)</span><strong id="lossRate">45%</strong></div>
+<div class="row"><span>Số lệnh thắng kỳ vọng</span><strong class="green" id="winN">45 lệnh</strong></div>
+<div class="row"><span>Số lệnh hòa vốn kỳ vọng</span><strong id="beN">10 lệnh</strong></div>
+<div class="row"><span>Số lệnh thua kỳ vọng</span><strong class="red" id="lossN">45 lệnh</strong></div>
+<div class="row"><span>Tổng R từ lệnh thắng</span><strong class="green" id="grossWin">+90R</strong></div>
+<div class="row"><span>Tổng R mất từ lệnh thua</span><strong class="red" id="grossLoss">−45R</strong></div>
+<div class="row"><span>Tổng chi phí dự kiến</span><strong class="red" id="totalCost">−5R</strong></div>
+<div class="row"><span>Kết quả ròng kỳ vọng</span><strong id="netR">+40R</strong></div>
+</div>
+<div class="formula" id="formula">Kỳ vọng ròng = tỷ lệ thắng × RR − tỷ lệ thua − chi phí mỗi lệnh.</div>
+</section>
+<div class="twocol section-gap">
+<section class="panel"><h2>Quản lý giới hạn R</h2><div class="rows">
+<div class="row"><span>Mục tiêu lợi nhuận</span><strong class="green" id="targetOut">+10R</strong></div>
+<div class="row"><span>Giới hạn thua lỗ</span><strong class="red" id="stopOut">−10R</strong></div>
+<div class="row"><span>Số lệnh thắng cần nếu chỉ thắng</span><strong id="needWins">5 lệnh</strong></div>
+<div class="row"><span>Số lệnh thua liên tiếp chạm giới hạn</span><strong id="needLoss">10 lệnh</strong></div>
+</div><div class="note">Đây là phép tính ngưỡng đơn giản, không dự đoán thứ tự lệnh hay xác suất chạm giới hạn.</div></section>
+<section class="panel"><h2>Đánh giá hiệu suất</h2><div style="margin-bottom:12px"><span class="status" id="state">KỲ VỌNG DƯƠNG</span></div><div class="rows">
+<div class="row"><span>RR hòa vốn sau chi phí</span><strong id="rrBE">—</strong></div>
+<div class="row"><span>Biên kỳ vọng sau chi phí</span><strong id="edge">—</strong></div>
+<div class="row"><span>Chi phí / tổng lợi nhuận gộp</span><strong id="costRatio">—</strong></div>
+</div><div class="note" id="stateNote">Các kết quả là giá trị kỳ vọng, không phải kết quả chắc chắn.</div></section>
+</div>
+<div class="note">Mô hình thuần R. Tỷ lệ thắng + tỷ lệ hòa vốn không được vượt 100%; nếu kéo vượt, hệ thống sẽ tự giới hạn tỷ lệ hòa vốn. Hệ số lợi nhuận được tính bằng tổng lời gộp chia tổng lỗ gộp; chưa tính chi phí trong tử số và mẫu số theo cách tính chuẩn thường dùng.</div>
+</main></div></div></div><script>(()=>{'use strict';const $=id=>document.getElementById(id),MAX=25*1024*1024;let trades=[],filtered=[],mode='',frame=0,showAllLedger=false;
+const norm=s=>String(s??'').replace(/^\uFEFF/,'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9%]+/g,' ').replace(/\s+/g,' ').trim();const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function csv(text){text=text.replace(/^\uFEFF/,'');const first=text.split(/\r?\n/).find(x=>x.trim())||'',d=[',',';','\t'].sort((a,b)=>first.split(a).length-first.split(b).length).at(-1),out=[],row=[];let cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(q&&text[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===d&&!q){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))out.push([...row]);row.length=0;cell=''}else cell+=c}if(cell.length||row.length){row.push(cell);if(row.some(x=>x.trim()))out.push(row)}return out}
+function num(v){if(v==null)return NaN;let s=String(v).trim().replace(/[\s\u00a0]/g,'').replace(/[%$€£₫]/g,'');if(!s)return NaN;const neg=/^\(.*\)$/.test(s);s=s.replace(/[()]/g,'').replace(/[^0-9,\.\-+]/g,'');const c=s.lastIndexOf(','),d=s.lastIndexOf('.');if(c>=0&&d>=0){const dec=c>d?',':'.',group=dec===','?'.':',';s=s.replaceAll(group,'').replace(dec,'.')}else if(c>=0){const p=s.split(',');s=p.length>2?p.join(''):p.join('.')}else if(d>=0){const p=s.split('.');s=p.length>2?p.join(''):p.join('.')}const n=Number(s);return Number.isFinite(n)?(neg?-n:n):NaN}function date(v){const s=String(v||''),vn=s.match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\s+thg\s+(\d{1,2}),?\s+(\d{4})/i),iso=s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);if(vn)return new Date(+vn[5],+vn[4]-1,+vn[3],+vn[1],+vn[2]);if(iso)return new Date(+iso[1],+iso[2]-1,+iso[3],+iso[4],+iso[5],+(iso[6]||0));const x=new Date(s);return Number.isNaN(+x)?null:x}
+const money=(v,d=2)=>Number.isFinite(v)?new Intl.NumberFormat('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v):'—',signed=(v,u='')=>(v>0?'+':'')+money(v)+u,cls=v=>v>0?'positive':v<0?'negative':'neutral',pct=v=>Number.isFinite(v)?money(v,1)+'%':'—',card=(a,b,c='',cl='neutral')=>`<div class="kpi"><div class="label">${a}</div><div class="value ${cl}">${b}</div><div class="hint">${c}</div></div>`;const max=a=>{let x=-Infinity;for(const v of a)if(Number.isFinite(v)&&v>x)x=v;return x===-Infinity?NaN:x},min=a=>{let x=Infinity;for(const v of a)if(Number.isFinite(v)&&v<x)x=v;return x===Infinity?NaN:x};
+const aliases={symbol:['ma giao dich','symbol','ticker','market'],id:['so thu tu giao dich','trade number','trade id','id'],side:['ben','side','action','direction'],type:['loai','type','order type'],qty:['khoi luong','quy mo vi the s lg','position size','size','quantity'],price:['gia khop lenh','fill price','gia usdt','gia usd','gia','price','exit price'],pnl:['lai lo rong usd','lai lo rong usdt','net pnl usd','net pnl usdt','net pnl','p l','profit','pnl'],fee:['hoa hong usd','hoa hong usdt','hoa hong','commission','fees'],time:['ngay gio','date time','datetime','time','date'],signal:['tin hieu','signal','exit reason','reason'],status:['trang thai','status'],created:['thoi diem dat lenh','created time','order time'],closed:['gio dong cua','close time','closed time'],leverage:['don bay','leverage']};
+function hdr(row){const h=row.map(norm),get=(k)=>{for(const a of aliases[k]||[]){const n=norm(a),i=h.findIndex(x=>x===n);if(i>=0)return i}return -1};return Object.fromEntries(Object.keys(aliases).map(k=>[k,get(k)]))}const get=(r,h,k)=>h[k]<0?'':r[h[k]]??'';const ok=v=>{const x=norm(v);return x.includes('thuc hien thanh cong')||x==='filled'||x==='executed'||x==='complete'};const market=v=>{const x=norm(v);return x==='thi truong'||x==='market'};const exitType=v=>{const x=norm(v);return x==='gioi han'||x==='lenh dung'||x==='cat lo'||x==='chot lai'||x==='limit'||x==='stop'||x==='stop loss'||x==='take profit'};const buy=v=>{const x=norm(v);return x==='mua'||x==='buy'||x==='long'};function closedDir(v){const x=norm(v);if(x.includes('short'))return'Short';if(x.includes('long'))return'Long';return x.includes('mua')||x.includes('buy')?'Short':x.includes('ban')||x.includes('sell')?'Long':'—'}
+function direct(rows,h){let source=rows.slice(1).map((r,i)=>({id:get(r,h,'id')||i+1,symbol:get(r,h,'symbol')||'—',type:get(r,h,'type'),time:get(r,h,'time'),dt:date(get(r,h,'time')),signal:get(r,h,'signal'),price:num(get(r,h,'price')),qty:num(get(r,h,'qty')),pnl:num(get(r,h,'pnl')),fee:num(get(r,h,'fee'))})).filter(t=>Number.isFinite(t.pnl));
+// TradingView Replay exports the same trade-level P/L on both its entry and exit
+// rows. Count only the close row so each trade contributes once.
+const replay=source.some(t=>/^vao lenh|^vao /i.test(norm(t.type)))&&source.some(t=>/^thoat lenh|^thoat /i.test(norm(t.type)));
+if(replay)source=source.filter(t=>/^thoat lenh|^thoat /i.test(norm(t.type)));
+if(!source.length)return[];return source.map(t=>{const type=norm(t.type),dir=replay?(type.includes('mua')?'Long':type.includes('ban')?'Short':'—'):closedDir(t.type);return{id:t.id,symbol:t.symbol,dir,time:t.time,dt:t.dt,signal:t.signal,qty:t.qty,entry:NaN,exit:t.price,gross:t.pnl+(Number.isFinite(t.fee)?t.fee:0),fee:Number.isFinite(t.fee)?t.fee:0,pnl:t.pnl,kind:'P/L trực tiếp'}})}
+function inferOrders(rows,h){const orders=rows.slice(1).map((r,i)=>({row:i+2,symbol:get(r,h,'symbol')||'—',side:get(r,h,'side'),type:get(r,h,'type'),qty:num(get(r,h,'qty')),fill:num(get(r,h,'price')),fee:num(get(r,h,'fee')),status:get(r,h,'status'),created:date(get(r,h,'created')||get(r,h,'time')),closed:date(get(r,h,'closed')),createdText:get(r,h,'created')||get(r,h,'time'),closedText:get(r,h,'closed'),leverage:get(r,h,'leverage')}));const en=orders.filter(o=>ok(o.status)&&market(o.type)&&Number.isFinite(o.qty)&&Number.isFinite(o.fill)).sort((a,b)=>(a.created?.getTime()||0)-(b.created?.getTime()||0)),ex=orders.filter(o=>ok(o.status)&&exitType(o.type)&&Number.isFinite(o.qty)&&Number.isFinite(o.fill)).sort((a,b)=>(a.closed?.getTime()||Infinity)-(b.closed?.getTime()||Infinity)),used=new Set(),out=[];for(const e of ex){const a=[...en].reverse().find(x=>!used.has(x.row)&&x.symbol===e.symbol&&buy(x.side)!==buy(e.side)&&Math.abs(x.qty-e.qty)<Math.max(1e-8,Math.abs(x.qty)*1e-7)&&(!x.created||!e.closed||x.created<=e.closed));if(!a)continue;used.add(a.row);const long=buy(a.side),gross=(long?e.fill-a.fill:a.fill-e.fill)*a.qty,fee=(Number.isFinite(a.fee)?a.fee:0)+(Number.isFinite(e.fee)?e.fee:0);out.push({id:a.row,symbol:a.symbol,dir:long?'Long':'Short',time:e.closedText||a.createdText,dt:e.closed||a.created,signal:e.type,qty:a.qty,entry:a.fill,exit:e.fill,gross,fee,pnl:gross-fee,kind:'Suy ra từ lệnh'})}return{out,orders:orders.length,entries:en.length,exits:ex.length}}
+function load(text,name){window.__edgeScenarioInitialized=false;showAllLedger=false;const rows=csv(text);if(rows.length<2)throw Error('CSV không có dữ liệu.');const h=hdr(rows[0]);if(h.pnl>=0){trades=direct(rows,h);mode='P/L trực tiếp';if(!trades.length)throw Error('Có cột P/L nhưng không có giá trị số hợp lệ.')}else if(h.symbol>=0&&h.side>=0&&h.type>=0&&h.qty>=0&&h.price>=0&&h.status>=0){const x=inferOrders(rows,h);trades=x.out;mode='P/L suy ra từ lịch sử lệnh';if(!trades.length)throw Error(`Không thể suy ra giao dịch đóng: nhận ra ${x.entries} lệnh vào và ${x.exits} lệnh ra đã khớp, nhưng không ghép được cặp mã/bên/khối lượng.`)}else throw Error('Không nhận diện được P/L trực tiếp hoặc cấu trúc lịch sử lệnh có thể ghép. CSV cần ít nhất cột P/L, hoặc Mã/Bên/Loại/Khối lượng/Giá khớp/Trạng thái.');trades.sort((a,b)=>(a.dt?.getTime()||Infinity)-(b.dt?.getTime()||Infinity));$('source').textContent=`${mode} · ${name.replace(/\.csv$/i,'')}`;$('period').textContent=(trades[0]?.time||'Không rõ thời điểm')+' — '+(trades.at(-1)?.time||'Không rõ thời điểm');$('report').hidden=false;$('status').className='status';$('status').textContent=`Đã nạp ${name}: ${trades.length} giao dịch dùng nguồn “${mode}”.`;render()}
+function calc(ts){const risk=Math.max(.000001,num($('risk').value)||1000),capital=Math.max(0,num($('capital').value)||0);let cum=0,peak=capital,ddMax=0,w=0,l=0,f=0,gp=0,gl=0;const en=ts.map((t,i)=>{cum+=t.pnl;const eq=capital+cum;peak=Math.max(peak,eq);const dd=eq-peak;ddMax=Math.max(ddMax,-dd);if(t.pnl>0){w++;gp+=t.pnl}else if(t.pnl<0){l++;gl-=t.pnl}else f++;return{...t,n:i+1,r:t.pnl/risk,cum,equity:eq,dd}}),n=ts.length,net=cum,aw=w?gp/w:0,al=l?gl/l:0;return{en,n,net,risk,capital,w,l,f,gp,gl,wr:n?w/n*100:0,pf:gl?gp/gl:gp?Infinity:0,aw,al,payoff:al?aw/al:NaN,ddMax,fee:ts.reduce((s,t)=>s+t.fee,0),best:max(ts.map(t=>t.pnl)),worst:min(ts.map(t=>t.pnl))}}
+function render(){if(!trades.length)return;const d=$('direction').value,q=norm($('search').value);filtered=trades.filter(t=>(d==='all'||t.dir===d)&&norm([t.symbol,t.dir,t.time,t.signal].join(' ')).includes(q));const s=calc(filtered);$('count').textContent=`${s.n} / ${trades.length} giao dịch`;$('kpis').innerHTML=card('P/L ròng',signed(s.net),`${s.n} giao dịch`,cls(s.net))+card('Tổng R',signed(s.net/s.risk,' R'),`1R = ${money(s.risk)}`,cls(s.net))+card('Tỷ lệ thắng',pct(s.wr),`${s.w} thắng · ${s.l} thua · ${s.f} hòa`)+card('Profit factor',s.pf===Infinity?'∞':money(s.pf),'Tổng lãi / tổng lỗ',s.pf>=1?'positive':'negative')+card('Drawdown tối đa','-'+money(s.ddMax),'Theo P/L đã đóng','negative')+card('Số dư cuối kỳ',money(s.capital+s.net),`Vốn đầu kỳ ${money(s.capital)}`,cls(s.net))+card('Hoa hồng',money(s.fee),'Theo dữ liệu nguồn')+card('Payoff ratio',money(s.payoff),'Lãi TB / lỗ TB')+card('Lệnh tốt nhất',signed(s.best),'P/L ròng')+card('Lệnh tệ nhất',signed(s.worst),'P/L ròng')+card('Lệnh Long',filtered.filter(t=>t.dir==='Long').length,'Theo bộ lọc')+card('Lệnh Short',filtered.filter(t=>t.dir==='Short').length,'Theo bộ lọc');$('breakdown').innerHTML=card('Tổng lãi',signed(s.gp),'Gross profit','positive')+card('Tổng lỗ','-'+money(s.gl),'Gross loss','negative')+card('P/L trước phí',signed(s.net+s.fee),'Gross P/L')+card('Hoa hồng',money(s.fee),'Tổng phí')+card('P/L TB / lệnh',signed(s.n?s.net/s.n:NaN),'Net P/L')+card('Expectancy',signed(s.n?s.net/s.n/s.risk:NaN,' R'),'Trung bình mỗi lệnh');renderEdge(s);const g={};for(const t of filtered)(g[t.symbol]??=[]).push(t);$('symbols').innerHTML=Object.entries(g).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,a])=>{const z=calc(a);return`<tr><td>${esc(k)}</td><td>${z.n}</td><td>${z.w}</td><td>${pct(z.wr)}</td><td class="${cls(z.net)}">${signed(z.net)}</td><td>${signed(z.net/z.risk,'R')}</td><td>${money(z.fee)}</td></tr>`}).join('');const ledgerRows=s.en.slice().reverse(),visibleLedger=showAllLedger?ledgerRows:ledgerRows.slice(0,20);$('ledgerMeta').textContent=`Đang hiển thị ${visibleLedger.length}/${s.n} giao dịch · ${mode}. ${showAllLedger?'Đã mở rộng toàn bộ lịch sử.':'Mặc định hiển thị 20 giao dịch mới nhất.'}`;$('ledgerToggle').textContent=showAllLedger?'Thu gọn còn 20 giao dịch':'Hiển thị tất cả';$('ledgerToggle').disabled=s.n<=20;$('ledger').innerHTML=visibleLedger.map(t=>`<tr><td>${esc(t.id)}</td><td>${esc(t.time)}</td><td>${esc(t.symbol)}</td><td>${t.dir}</td><td>${esc(t.kind)}</td><td>${money(t.entry,6)}</td><td>${money(t.exit,6)}</td><td>${money(t.qty,4)}</td><td class="${cls(t.gross)}">${signed(t.gross)}</td><td>-${money(t.fee)}</td><td class="${cls(t.pnl)}">${signed(t.pnl)}</td><td>${signed(t.r,'R')}</td></tr>`).join('');
+function renderEdge(s){
+ const n=s.n||0, risk=s.risk||1;
+ const wins=filtered.filter(t=>t.pnl>0), losses=filtered.filter(t=>t.pnl<0), flats=filtered.filter(t=>t.pnl===0);
+ const grossWins=filtered.filter(t=>t.gross>0), grossLosses=filtered.filter(t=>t.gross<0), grossFlats=filtered.filter(t=>t.gross===0);
+ const avgWinR=grossWins.length?grossWins.reduce((a,t)=>a+t.gross/risk,0)/grossWins.length:0;
+ const avgLossR=grossLosses.length?grossLosses.reduce((a,t)=>a+Math.abs(t.gross)/risk,0)/grossLosses.length:0;
+ const wr=n?wins.length/n:0, lr=n?losses.length/n:0, be=n?flats.length/n:0;
+ const exp=n?s.net/risk/n:0, avgCost=n?Math.abs(s.fee)/risk/n:0;
+ const pf=s.gl?s.gp/s.gl:s.gp>0?Infinity:NaN;
+ const grossWinRate=n?grossWins.length/n:0, grossLossRate=n?grossLosses.length/n:0;
+ const componentExp=grossWinRate*avgWinR-grossLossRate*avgLossR-avgCost;
+ const denom=avgWinR+avgLossR;
+ const breakEven=denom>0?(avgLossR+avgCost)/denom:NaN;
+ const status=$('actualVerdict');
+ $('actualR').innerHTML=card('Kỳ vọng ròng / lệnh',signed(exp,' R'),'P/L ròng ÷ 1R ÷ số lệnh',exp>0?'positive':exp<0?'negative':'neutral')
+ +card('Tổng kết quả',signed(s.net/risk,' R'),`${n} giao dịch sau bộ lọc`,cls(s.net))
+ +card('Tỷ lệ thắng',pct(wr*100),`${wins.length} lệnh có P/L ròng dương`,wr>=.5?'positive':'neutral')
+ +card('Profit factor',Number.isFinite(pf)?money(pf):pf===Infinity?'∞':'—','Tổng lãi ròng / tổng lỗ ròng',pf>=1?'positive':'negative');
+ $('actualCounts').textContent=`${wins.length} / ${losses.length} / ${flats.length}`;
+ $('actualRates').textContent=`${pct(wr*100)} / ${pct(lr*100)} / ${pct(be*100)}`;
+ $('actualRR').textContent=money(avgWinR,2)+'R'; $('actualLoss').textContent=money(avgLossR,2)+'R';
+ $('actualCost').textContent=money(avgCost,3)+'R'; $('actualBE').textContent=Number.isFinite(breakEven)?(breakEven>1?'>100%':pct(breakEven*100)):'Không đủ dữ liệu';
+ $('actualFormula').textContent='E = P(thắng) × lời TB − P(thua) × lỗ TB − phí TB';
+ $('actualComponentExp').textContent=signed(componentExp,' R');
+ $('actualSample').textContent=n<30?'Rất nhỏ':n<100?'Còn hạn chế':n<300?'Trung bình':'Lớn hơn, vẫn cần kiểm định';
+ let headline,summary;
+ if(!n){headline='CHƯA CÓ DỮ LIỆU';summary='Không có giao dịch trong bộ lọc hiện tại. Hãy đổi bộ lọc hoặc nạp một CSV có giao dịch hợp lệ.'}
+ else if(n<30){headline='MẪU CÒN NHỎ';summary=`Có ${n} giao dịch. Kỳ vọng quan sát ${signed(exp,' R')}/lệnh ${exp>0?'đang dương':exp<0?'đang âm':'đang gần hòa vốn'}, nhưng số lệnh này còn quá ít để kết luận hệ thống có lợi thế ổn định. Ưu tiên tiếp tục thu thập mẫu theo cùng một quy tắc giao dịch.`}
+ else if(exp>0){headline='KỲ VỌNG QUAN SÁT DƯƠNG';summary=`Mẫu ${n} lệnh cho kỳ vọng ròng ${signed(exp,' R')}/lệnh và tổng kết quả ${signed(s.net/risk,' R')}. Đây là dấu hiệu tích cực trong mẫu đã kiểm tra, chưa phải bằng chứng rằng lợi thế sẽ duy trì ở dữ liệu tương lai.`}
+ else if(exp<0){headline='KỲ VỌNG QUAN SÁT ÂM';summary=`Mẫu ${n} lệnh cho kỳ vọng ròng ${signed(exp,' R')}/lệnh. Với dữ liệu hiện tại, mỗi lệnh trung bình đang làm giảm kết quả. Cần xem riêng tỷ lệ thắng, mức lời/lỗ trung bình, chi phí và các nhóm giao dịch trước khi quyết định điều chỉnh.`}
+ else{headline='KỲ VỌNG QUAN SÁT GẦN 0';summary=`Kết quả trung bình đang ở mức hòa vốn (${signed(exp,' R')}/lệnh). Khi chưa có biên lợi nhuận đủ bù chi phí, sai số thực thi và biến động chuỗi lệnh có thể khiến kết quả thực tế chuyển sang âm.`}
+ status.textContent=headline; status.className='rstatus '+(exp>0?'positive':exp<0?'negative':'');
+ $('actualSummary').textContent=summary;
+ $('expectancyGuide').innerHTML=`<p><strong>1. Kỳ vọng ròng mỗi lệnh (E):</strong> ${signed(exp,' R')}. Đây là mức lời/lỗ ròng trung bình của một giao dịch trong CSV, đã chuẩn hóa theo 1R. E &gt; 0 nghĩa là mẫu lịch sử có lợi nhuận trung bình; E &lt; 0 nghĩa là mẫu đang thua trung bình. E không cho biết thứ tự thắng thua hay mức sụt giảm có thể xảy ra.</p><p><strong>2. Các thành phần tạo kỳ vọng:</strong> tỷ lệ thắng cần được đọc cùng mức lời trung bình; tỷ lệ thắng cao vẫn có thể thua nếu lệnh thắng nhỏ hơn lệnh thua. Công thức lý thuyết là E ≈ tỷ lệ thắng × lời trung bình − tỷ lệ thua × lỗ trung bình − chi phí trung bình. Kỳ vọng theo thành phần (${signed(componentExp,' R')}) có thể lệch kỳ vọng thực tế (${signed(exp,' R')}) do cách CSV ghi P/L/phí, phân loại hòa vốn hoặc cách ghép lệnh.</p><p><strong>3. Tỷ lệ thắng hòa vốn:</strong> khoảng ${Number.isFinite(breakEven)?(breakEven>1?'>100%':pct(breakEven*100)):'không tính được'} theo RR lời/lỗ trung bình và chi phí ước tính. Nếu tỷ lệ thắng thực tế thấp hơn mức này, hệ thống có thể không đủ bù lỗ và chi phí theo mô hình trung bình. Đây là ước tính, không phải mục tiêu bắt buộc.</p><p><strong>4. Profit factor:</strong> ${Number.isFinite(pf)?money(pf):pf===Infinity?'∞':'không tính được'}. Trên 1 nghĩa là tổng lãi lớn hơn tổng lỗ trong mẫu; dưới 1 nghĩa là tổng lỗ lớn hơn tổng lãi. PF không thể hiện riêng mức rủi ro, độ dài chuỗi thua hay tính ổn định.</p><p><strong>5. Quy mô mẫu:</strong> ${n} lệnh. Mẫu càng lớn càng hữu ích, nhưng số lượng đơn thuần không đảm bảo chất lượng: cần xem hệ thống có thay đổi theo thời gian/thị trường hay không và kiểm tra trên dữ liệu ngoài mẫu chưa dùng để tinh chỉnh.</p>`;
+}
+$('method').innerHTML=mode==='P/L trực tiếp'?'<strong>Nguồn P/L trực tiếp:</strong> OST dùng P/L ròng và hoa hồng có trong CSV. Hướng lệnh được suy từ hành động đóng: đóng bằng Mua → Short; đóng bằng Bán → Long. Trường thiếu hiển thị “—”.':'<strong>P/L suy ra:</strong> OST ghép lệnh Thị trường đã khớp với lệnh Giới hạn/Lệnh dừng đã khớp có mã, bên đối ứng và khối lượng tương ứng; P/L = chênh giá × khối lượng − tổng hoa hồng. Cặp không chắc chắn không được đưa vào báo cáo.';line($('equity'),s.en,s.capital);bars($('bars'),s.en)}
+function canv(c){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=Math.max(300,r.width*d);c.height=230*d;const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return{x,w:c.width/d,h:230}}function line(c,ts,cap){const{x,w,h}=canv(c);x.clearRect(0,0,w,h);if(!ts.length)return;const v=[cap,...ts.map(t=>t.equity)],lo0=min(v),hi0=max(v),lo=lo0===hi0?lo0-1:lo0,hi=lo0===hi0?hi0+1:hi0,p={l:60,r:10,t:12,b:25},cw=w-p.l-p.r,ch=h-p.t-p.b;x.font='10px sans-serif';x.strokeStyle='#26354b';x.fillStyle='#91a2bc';for(let i=0;i<5;i++){const y=p.t+ch*i/4;x.beginPath();x.moveTo(p.l,y);x.lineTo(w-p.r,y);x.stroke();x.fillText(money(hi-(hi-lo)*i/4,0),2,y+3)}x.beginPath();v.forEach((n,i)=>{const px=p.l+i/(v.length-1||1)*cw,py=p.t+(hi-n)/(hi-lo)*ch;i?x.lineTo(px,py):x.moveTo(px,py)});x.strokeStyle='#75a7ff';x.lineWidth=2.5;x.stroke()}function bars(c,ts){const{x,w,h}=canv(c);x.clearRect(0,0,w,h);if(!ts.length)return;const mx=Math.max(1,max(ts.map(t=>Math.abs(t.pnl)))),p={l:10,r:10,t:15,b:24},cw=w-p.l-p.r,ch=h-p.t-p.b,z=p.t+ch/2;x.strokeStyle='#314158';x.beginPath();x.moveTo(p.l,z);x.lineTo(w-p.r,z);x.stroke();const st=cw/ts.length,bw=Math.max(2,Math.min(22,st*.62));ts.forEach((t,i)=>{const bh=Math.abs(t.pnl)/mx*ch*.43;x.fillStyle=t.pnl>=0?'#39d6a0':'#ff7185';x.fillRect(p.l+i*st+(st-bw)/2,t.pnl>=0?z-bh:z,bw,Math.max(1,bh))})}
+function err(e){$('status').className='status error';$('status').textContent=e instanceof Error?e.message:'Không thể đọc file.'}async function imp(f){if(f.size>MAX)throw Error('CSV vượt quá 25 MB; hãy tách nhỏ file.');load(await f.text(),f.name)}function schedule(){cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{frame=0;render()})}window.__ostScheduleRender=schedule;$('file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{await imp(f)}catch(x){err(x)}finally{e.target.value=''}});const drop=$('drop');drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag')});drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));drop.addEventListener('drop',async e=>{e.preventDefault();drop.classList.remove('drag');const f=e.dataTransfer.files[0];if(!f)return;try{await imp(f)}catch(x){err(x)}});['risk','capital','direction','search'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',schedule));$('ledgerToggle').onclick=()=>{showAllLedger=!showAllLedger;render()};$('reset').onclick=()=>{$('risk').value='1000';$('capital').value='';$('direction').value='all';$('search').value='';render()};$('print').onclick=()=>print();const cell=(v,p=false)=>{let s=String(v??'');if(p&&/^\s*[=+\-@]/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};$('export').onclick=()=>{if(!filtered.length)return;const s=calc(filtered),head=['#','Thời điểm','Mã','Hướng','Nguồn','Giá vào','Giá ra','Khối lượng','Gross P/L','Hoa hồng','P/L ròng','R'],data=[head,...s.en.map(t=>[t.id,t.time,t.symbol,t.dir,t.kind,t.entry,t.exit,t.qty,t.gross,t.fee,t.pnl,t.r])].map(r=>r.map((v,i)=>cell(v,i<5)).join(',')).join('\r\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+data],{type:'text/csv;charset=utf-8'}));a.download='OST_Analyzer_Results.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};addEventListener('resize',()=>{if(trades.length)schedule()})})();</script><script>
+(()=> {
+  const $ = id => document.getElementById(id);
+  const chooser = $('modeChooser'), csv = $('csvMode'), sim = $('simMode');
+  function show(which) {
+    chooser.hidden = which !== 'choose';
+    csv.hidden = which !== 'csv';
+    sim.hidden = which !== 'sim';
+    if (which === 'csv' && typeof window.__ostScheduleRender === 'function') window.__ostScheduleRender();
+    if (which === 'sim' && typeof window.__ostSimCalc === 'function') window.__ostSimCalc();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>show(btn.dataset.mode)));
+  document.querySelectorAll('[data-back]').forEach(btn=>btn.addEventListener('click',()=>show('choose')));
+  window.__ostShowMode = show;
+})();
+</script><script>(()=>{
+
+const $=id=>document.getElementById(id);
+const f=(x,d=2)=>Number(x).toLocaleString('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d});
+const signed=(x,d=2,s='R')=>(x>0?'+':x<0?'−':'')+f(Math.abs(x),d)+s;
+function calc(){
+ const rr=+$('rr').value, wr=+$('wr').value/100, trades=+$('trades').value, cost=+$('cost').value;
+ let be=+$('be').value/100;
+ if(wr+be>1){be=1-wr;$('be').value=Math.round(be*100);}
+ const loss=Math.max(0,1-wr-be), target=+$('target').value, stop=+$('stop').value;
+ const winN=trades*wr, beN=trades*be, lossN=trades*loss;
+ const grossWin=winN*rr, grossLoss=lossN, totalCost=trades*cost;
+ const grossNet=grossWin-grossLoss, net=grossNet-totalCost;
+ const exp=net/trades, pf=grossLoss===0?(grossWin>0?'∞':'—'):grossWin/grossLoss;
+ const wrBreak=rr+1===0?0:(1+cost-be*0)/(rr+1); // hòa vốn khi phần còn lại chia giữa thắng/thua, giữ BE cố định
+ const wrBreakAdjusted=(1+cost-be)/(rr+1);
+ $('rrV').textContent=f(rr,1)+'R';$('wrV').textContent=Math.round(wr*100)+'%';$('beV').textContent=Math.round(be*100)+'%';
+ $('tradesV').textContent=trades;$('costV').textContent=f(cost,2)+'R';$('targetV').textContent='+'+target+'R';$('stopV').textContent='−'+stop+'R';
+ $('expNet').textContent=signed(exp,3);$('expNet').className='v '+(exp>0?'green':exp<0?'red':'amber');
+ $('totalNet').textContent=signed(net,2);$('totalNet').className='v '+(net>0?'green':net<0?'red':'amber');
+ $('pf').textContent=pf==='∞'||pf==='—'?pf:f(pf,2);
+ $('wrBE').textContent=wrBreakAdjusted<0?'0%':wrBreakAdjusted>1?' >100%':f(wrBreakAdjusted*100,1)+'%';
+ $('lossRate').textContent=f(loss*100,1)+'%';$('winN').textContent=f(winN,1)+' lệnh';$('beN').textContent=f(beN,1)+' lệnh';$('lossN').textContent=f(lossN,1)+' lệnh';
+ $('grossWin').textContent=signed(grossWin,2);$('grossLoss').textContent='−'+f(grossLoss,2)+'R';$('totalCost').textContent='−'+f(totalCost,2)+'R';
+ $('netR').textContent=signed(net,2);$('netR').className=net>0?'green':net<0?'red':'';
+ $('targetOut').textContent='+'+target+'R';$('stopOut').textContent='−'+stop+'R';$('needWins').textContent=rr<=0?'Không đạt được':Math.ceil(target/rr)+' lệnh';$('needLoss').textContent=stop+' lệnh';
+ $('rrBE').textContent=wr===0?'Không thể tính':f((loss+cost)/wr,2)+'R';
+ $('edge').textContent=signed(exp,3)+'/lệnh';
+ $('costRatio').textContent=grossWin===0?'—':f(totalCost/grossWin*100,1)+'%';
+ const state=$('state');
+ if(exp>0){state.textContent='KỲ VỌNG DƯƠNG';state.style.color='var(--green)';state.style.background='#17382f';}
+ else if(exp<0){state.textContent='KỲ VỌNG ÂM';state.style.color='var(--red)';state.style.background='#3b202b';}
+ else{state.textContent='HÒA VỐN LÝ THUYẾT';state.style.color='var(--amber)';state.style.background='#3a3220';}
+ $('formula').innerHTML='<b>Công thức:</b> E ròng = ('+f(wr*100,0)+'% × '+f(rr,1)+'R) − ('+f(loss*100,0)+'% × 1R) − '+f(cost,2)+'R = <b>'+signed(exp,3)+'/lệnh</b>.';
+ $('stateNote').textContent=exp>0?'Kỳ vọng toán học dương trước khi xét biến động thực tế của chuỗi lệnh.':exp<0?'Kỳ vọng toán học âm; cân nhắc điều chỉnh chiến lược hoặc giảm chi phí.':'Kỳ vọng bằng 0 trước sai số và biến động thực tế.';
+}
+['rr','wr','be','trades','cost','target','stop'].forEach(id=>$(id).addEventListener('input',calc));
+document.querySelectorAll('[data-for][data-step]').forEach(btn=>btn.addEventListener('click',()=>{
+ const input=$(btn.dataset.for), step=Number(input.step)||1;
+ const next=Number(input.value)+Number(btn.dataset.step)*step;
+ input.value=String(Math.max(Number(input.min),Math.min(Number(input.max),Number(next.toFixed(8)))));
+ input.dispatchEvent(new Event('input',{bubbles:true}));
+}));
+function updateStepButtons(){
+ document.querySelectorAll('[data-for][data-step]').forEach(btn=>{
+  const input=$(btn.dataset.for), dir=Number(btn.dataset.step), value=Number(input.value);
+  btn.disabled=dir<0?value<=Number(input.min):value>=Number(input.max);
+ });
+}
+['rr','wr','be','trades','cost','target','stop'].forEach(id=>$(id).addEventListener('input',updateStepButtons));
+calc();updateStepButtons();
+
+window.__ostSimCalc=calc;
+})();</script></body></html>
